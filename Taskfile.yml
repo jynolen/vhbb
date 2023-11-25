@@ -1,0 +1,42 @@
+version: '3'
+
+env:
+  VITASDK: "{{.ROOT_DIR}}/.vitasdk"
+  BUILD_VERSION: 0.93
+  VERSION_YAML_URL: https://pastebin.com/raw/0BMffwB3
+  UPDATE_URL: https://github.com/devnoname120/vhbb/releases/download/0.92/VitaHBBrowser.vpk
+
+tasks:
+  clone:vitasdk:
+    cmds:
+      - git clone https://github.com/vitasdk/vdpm .vitasdk_bootstrap 
+    generates:
+      - .vitasdk_bootstrap 
+    status:
+      - test -d .vitasdk_bootstrap 
+  install:vitasdk:
+    cmds:
+      - .vitasdk_bootstrap/bootstrap-vitasdk.sh
+      - .vitasdk_bootstrap/install-all.sh
+    deps:
+      - clone:vitasdk
+    status:
+      - test -d .vitasdk 
+  build:release:
+    deps:
+      - install:vitasdk
+    dir: .build
+    cmds:
+      - cmake -S..
+              -DCMAKE_BUILD_TYPE=Release 
+              -DBUILD_VERSION={{.BUILD_VERSION}} 
+              -DUPDATE_URL={{.UPDATE_URL}} 
+              -DVERSION_YAML_URL={{.VERSION_YAML_URL}} 
+      - make -j
+  build:debug:
+    deps:
+      - install:vitasdk  
+    dotenv:
+      - .env
+    cmds:
+      - cmake -DDEBUGNET=ON -B.build -H.

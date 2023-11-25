@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8...3.22)
 
 macro(SET_EXPORTED VAR VAL EXPORT_PREFIX)
     set("${VAR}" "${VAL}")
@@ -16,6 +16,7 @@ function(create_updater MAIN_SHORT_NAME MAIN_TITLEID UPDATER_TITLEID PKG_FOLDER)
     endif ()
 
     set_exported(UPDATER_SHORT_NAME "${MAIN_SHORT_NAME}Updater" "${MAIN_SHORT_NAME}_")
+    set_exported(UPDATER_NAME "Vita Homebrew Browser Updater" "${MAIN_SHORT_NAME}_")
     set_exported(UPDATER_TITLEID ${UPDATER_TITLEID} "${MAIN_SHORT_NAME}_")
     set_exported(UPDATER_VERSION 00.01 "${MAIN_SHORT_NAME}_")
 
@@ -29,44 +30,50 @@ function(create_updater MAIN_SHORT_NAME MAIN_TITLEID UPDATER_TITLEID PKG_FOLDER)
     file(GLOB_RECURSE PROJECT_SOURCE_FILES ${UPDATER_SRC_DIR}/*.h ${UPDATER_SRC_DIR}/*.hpp ${UPDATER_SRC_DIR}/*.cpp ${UPDATER_SRC_DIR}/*.c)
 
     add_executable(${UPDATER_ELF_NAME}
-            ${PROJECT_SOURCE_FILES}
-            )
+      ${PROJECT_SOURCE_FILES}
+    )
 
     if (CMAKE_BUILD_TYPE MATCHES Debug AND DEBUGNET)
-        target_link_libraries(${UPDATER_ELF_NAME} debugnet)
+      target_link_libraries(${UPDATER_ELF_NAME} debugnet)
     endif ()
 
     target_compile_definitions(${UPDATER_ELF_NAME}
-            PRIVATE UPDATE_TITLEID="${MAIN_TITLEID}"
-            PACKAGE_DIR="${PKG_FOLDER}"
-            UPDATER_VERSION="${UPDATER_VERSION}"
-            )
+      PRIVATE UPDATER_TITLEID="${MAIN_TITLEID}"
+      PACKAGE_DIR="${PKG_FOLDER}"
+      UPDATER_VERSION="${UPDATER_VERSION}"
+    )
     target_link_libraries(${UPDATER_ELF_NAME}
-            SceNetCtl_stub
-            SceNet_stub
-            SceShellSvc_stub
-            SceAppMgr_stub
-            SceDriverUser_stub
-            ScePromoterUtil_stub
-            SceSysmodule_stub
-            SceVshBridge_stub
-            )
-
-    add_custom_command(OUTPUT ${UPDATER_VELF_NAME}
-            COMMAND ${VITA_ELF_CREATE} ${UPDATER_ELF_NAME} ${UPDATER_VELF_NAME}
-            DEPENDS ${UPDATER_ELF_NAME}
-            COMMENT "Converting to Sony ELF ${UPDATER_VELF_NAME}" VERBATIM
-            )
-    set(UPDATER_MAKE_FSELF_FLAGS -c)
-    add_custom_target(${UPDATER_SELF_NAME}
-            COMMAND ${VITA_MAKE_FSELF} ${UPDATER_MAKE_FSELF_FLAGS} ${UPDATER_VELF_NAME} ${UPDATER_SELF_NAME}
-            DEPENDS ${UPDATER_VELF_NAME}
-            COMMENT "Creating SELF ${UPDATER_SELF_NAME}"
-            )
+      SceNetCtl_stub
+      SceNet_stub
+      SceShellSvc_stub
+      SceAppMgr_stub
+      SceDriverUser_stub
+      ScePromoterUtil_stub
+      SceSysmodule_stub
+      SceVshBridge_stub
+    )
+    add_custom_target(${UPDATER_EBOOT_NAME}
+      vita_create_self(${UPDATER_SHORT_NAME}.self ${UPDATER_SHORT_NAME})
+      vita_create_vpk(${UPDATER_SHORT_NAME}.vpk ${UPDATER_TITLEID} ${UPDATER_SHORT_NAME}.self
+        VERSION ${UPDATER_VERSION}
+        NAME ${UPDATER_NAME}
+      )
+    )    
+    # add_custom_command(OUTPUT ${UPDATER_VELF_NAME}
+    #   COMMAND ${VITA_ELF_CREATE} ${UPDATER_ELF_NAME} ${UPDATER_VELF_NAME}
+    #   DEPENDS ${UPDATER_ELF_NAME}
+    #   COMMENT "Converting to Sony ELF ${UPDATER_VELF_NAME}" VERBATIM
+    # )
+    # set(UPDATER_MAKE_FSELF_FLAGS -c)
+    #   add_custom_target(${UPDATER_SELF_NAME}
+    #   COMMAND ${VITA_MAKE_FSELF} ${UPDATER_MAKE_FSELF_FLAGS} ${UPDATER_VELF_NAME} ${UPDATER_SELF_NAME}
+    #   DEPENDS ${UPDATER_VELF_NAME}
+    #   COMMENT "Creating SELF ${UPDATER_SELF_NAME}"
+    # )
 
     set(UPDATER_MKSFOEX_FLAGS -s APP_VER=${UPDATER_VERSION} -s TITLE_ID=${UPDATER_TITLEID})
     add_custom_target(${UPDATER_SFO_NAME}
-            COMMAND ${VITA_MKSFOEX} ${UPDATER_MKSFOEX_FLAGS} ${UPDATER_SHORT_NAME} ${UPDATER_SFO_NAME}
-            COMMENT "Generating param.sfo for ${UPDATER_SHORT_NAME}"
-            )
+      COMMAND ${VITA_MKSFOEX} ${UPDATER_MKSFOEX_FLAGS} ${UPDATER_SHORT_NAME} ${UPDATER_SFO_NAME}
+      COMMENT "Generating param.sfo for ${UPDATER_SHORT_NAME}"
+    )
 endfunction(create_updater)
