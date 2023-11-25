@@ -5,7 +5,7 @@
 #include <string>
 
 #define LOG_DIR "ux0:/log"
-#define LOG_FILE UPDATE_TITLEID "_updater"
+#define LOG_FILE UPDATER_TITLEID "_updater"
 
 inline std::string methodName(const std::string &prettyFunction) {
 	size_t args_start = prettyFunction.find('(');

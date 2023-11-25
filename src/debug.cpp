@@ -52,7 +52,8 @@ int log_init(bool log_to_file)
         if (_vshSblGetSystemSwVersion(&data) >= 0) // sceKernelGetSystemSwVersion is spoofed version
         {
             char version[16];
-            snprintf(version, 16, "%s", data.versionString);
+            strncpy(version, data.versionString, sizeof(version) -1);
+            version[15] = '\0';
             _log_printf(DBG_INFO, "- OS: %s\n", version);
         }
 

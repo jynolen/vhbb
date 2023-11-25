@@ -47,7 +47,7 @@ int log_init(bool log_to_file)
 		g_log_fd = sceIoOpen(log_file.c_str(), SCE_O_WRONLY | SCE_O_CREAT | SCE_O_TRUNC, 0777);
 	}
 
-	_log_printf(DBG_INFO, "Updater for " UPDATE_TITLEID " started.\n");
+	_log_printf(DBG_INFO, "Updater for " UPDATER_TITLEID " started.\n");
 	_log_printf(DBG_INFO, "- Version: %s\n", UPDATER_VERSION);
 
 	SceKernelFwInfo data;
@@ -55,7 +55,8 @@ int log_init(bool log_to_file)
 
 	if (_vshSblGetSystemSwVersion(&data) >= 0) { // sceKernelGetSystemSwVersion is spoofed version
 		char version[16];
-		snprintf(version, 16, "%s", data.versionString);
+		strncpy(version, data.versionString, sizeof(version) -1);
+		version[15] = '\0';
 		_log_printf(DBG_INFO, "- OS: %s\n", version);
 	}
 

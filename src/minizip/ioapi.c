@@ -97,7 +97,7 @@ static voidpf file_build_ioposix(SceUID fd, const char* filename)
     ioposix->error = 0;
     ioposix->filenameLength = strlen(filename) + 1;
     ioposix->filename = (char*)malloc(ioposix->filenameLength * sizeof(char));
-    strncpy(ioposix->filename, filename, ioposix->filenameLength);
+    strlcpy(ioposix->filename, filename, strlen(filename) + 1);
     return (voidpf)ioposix;
 }
 

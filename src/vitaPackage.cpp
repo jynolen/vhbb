@@ -216,7 +216,7 @@ VitaPackage::VitaPackage(const std::string vpk)
 {
     log_printf(DBG_INFO, "Loading PAF");
     // ScePaf is required for PromoterUtil
-    SceSysmoduleOpt opt = { 0 };
+    SceSysmoduleOpt opt = {};
     opt.result = &opt.flags;
     uint32_t scepaf_argp[] = { 0x400000, 0xEA60, 0x40000, 0, 0 };
     sceSysmoduleLoadModuleInternalWithArg(SCE_SYSMODULE_INTERNAL_PAF, sizeof(scepaf_argp), scepaf_argp, &opt);

@@ -50,20 +50,20 @@ void StatusBar::getDateString(char *string, int date_format, SceDateTime *time)
 {
 	switch (date_format) {
 		case SCE_SYSTEM_PARAM_DATE_FORMAT_YYYYMMDD:
-			sprintf(string, "%04d/%02d/%02d", time->year, time->month, time->day);
+			sprintf(string, "%hu/%02hu/%02hu", time->year, time->month, time->day);
 			break;
 
 		case SCE_SYSTEM_PARAM_DATE_FORMAT_DDMMYYYY:
-			sprintf(string, "%02d/%02d/%04d", time->day, time->month, time->year);
+			sprintf(string, "%02hu/%02hu/%hu", time->day, time->month, time->year);
 			break;
 
 		case SCE_SYSTEM_PARAM_DATE_FORMAT_MMDDYYYY:
-			sprintf(string, "%02d/%02d/%04d", time->month, time->day, time->year);
+			sprintf(string, "%02hu/%02hu/%hu", time->month, time->day, time->year);
 			break;
 
 		default:
 			log_printf(DBG_WARNING, "Unexpected system date format: %u", date_format);
-			sprintf(string, "%04d/%02d/%02d", time->year, time->month, time->day);
+			sprintf(string, "%hu/%02hu/%02hu", time->year, time->month, time->day);
 			break;
 	}
 }

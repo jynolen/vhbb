@@ -1,5 +1,5 @@
-#ifndef UPDATE_TITLEID
-#    error UPDATE_TITLEID must be specified
+#ifndef UPDATER_TITLEID
+#    error UPDATER_TITLEID must be specified
 #endif
 #ifndef PACKAGE_DIR
 #    warning PACKAGE_DIR not set using default "ux0:data/pkg/"
@@ -68,8 +68,7 @@ static int loadScePaf()
     static uint32_t argp[] = { 0x180000, 0xFFFFFFFF, 0xFFFFFFFF, 1, 0xFFFFFFFF, 0xFFFFFFFF };
 
     int result = -1;
-
-    SceSysmoduleOpt opt = { 0 };
+    SceSysmoduleOpt opt = {};
     opt.flags = sizeof(opt);
     opt.result = &result;
     opt.unused[0] = -1;
@@ -80,7 +79,7 @@ static int loadScePaf()
 
 static int unloadScePaf()
 {
-    SceSysmoduleOpt opt = { 0 };
+    SceSysmoduleOpt opt = {};
     return sceSysmoduleUnloadModuleInternalWithArg(SCE_SYSMODULE_INTERNAL_PAF, 0, nullptr, &opt);
 }
 
@@ -245,22 +244,22 @@ int main()
     log_printf(DBG_INFO, "Killed other apps");
 
     char* titleid = get_title_id(PACKAGE_DIR "/sce_sys/param.sfo");
-    log_printf(DBG_DEBUG, "Found staged app: %s; looking for: %s", titleid, UPDATE_TITLEID);
+    log_printf(DBG_DEBUG, "Found staged app: %s; looking for: %s", titleid, UPDATER_TITLEID);
 
-    if (titleid && strcmp(titleid, UPDATE_TITLEID) == 0)
+    if (titleid && strcmp(titleid, UPDATER_TITLEID) == 0)
     {
         log_printf(DBG_INFO, "Staged update found -> Start promoting");
         promoteApp(PACKAGE_DIR);
     }
     else
     {
-        log_printf(DBG_WARNING, "Staged app %s didn't match expected app %s", titleid, UPDATE_TITLEID);
+        log_printf(DBG_WARNING, "Staged app %s didn't match expected app %s", titleid, UPDATER_TITLEID);
     };
 
-    log_printf(DBG_INFO, "All done. Starting updated app: %s", UPDATE_TITLEID);
+    log_printf(DBG_INFO, "All done. Starting updated app: %s", UPDATER_TITLEID);
 
     sceKernelDelayThread(250000);
-    launchAppByUriExit(UPDATE_TITLEID);
+    launchAppByUriExit(UPDATER_TITLEID);
 
     return 0;
 }
